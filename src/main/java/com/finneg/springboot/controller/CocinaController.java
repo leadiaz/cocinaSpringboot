@@ -1,8 +1,11 @@
 package com.finneg.springboot.controller;
 
 import com.finneg.springboot.model.Cocina;
+import com.finneg.springboot.model.dto.BanioDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,16 +16,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @Api(value = "es un controller")
 public class CocinaController {
 
     private List<Cocina> cocinas = new ArrayList<>();
+    RestTemplate restTemplate = new RestTemplate();
+    String url = "http://localhost:8081";
     @PostConstruct
     private void postConstruct(){
         Cocina cocina =  new Cocina();
@@ -76,4 +84,20 @@ public class CocinaController {
         return cocinas;
     }
 
+    @GetMapping(value = "/banios", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<BanioDto> getAllBanios(){
+        ResponseEntity<BanioDto[]> responseEntity = restTemplate.getForEntity(url + "/banios", BanioDto[].class);
+        return Arrays.asList(Objects.requireNonNull(responseEntity.getBody()));
+    }
+
+    @PostMapping(value = "/banio", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<BanioDto> addBanio(@RequestBody BanioDto dto){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<BanioDto> request = new HttpEntity<>(dto, headers);
+        ResponseEntity<BanioDto[]> response = restTemplate.postForEntity( url+"/banio", request , BanioDto[].class );
+        return Arrays.asList(response.getBody());
+
+    }
 }
