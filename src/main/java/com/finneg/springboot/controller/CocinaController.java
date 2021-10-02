@@ -94,7 +94,6 @@ public class CocinaController {
     public List<BanioDto> addBanio(@RequestBody BanioDto dto){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
         HttpEntity<BanioDto> request = new HttpEntity<>(dto, headers);
         ResponseEntity<BanioDto[]> response = restTemplate.postForEntity( url+"/banio", request , BanioDto[].class );
         return Arrays.asList(response.getBody());
